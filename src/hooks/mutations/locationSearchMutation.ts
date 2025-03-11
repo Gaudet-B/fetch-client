@@ -44,6 +44,6 @@ async function getLocations(input: LocationMutationInput) {
   return locations;
 }
 
-export default function locationSearchMutation() {
+export default function useLocationSearchMutation() {
   return useMutation({ mutationFn: getLocations });
 }

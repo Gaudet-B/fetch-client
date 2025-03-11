@@ -60,7 +60,7 @@ export default function useSearchQuery(options?: SearchOptions) {
         queryKey: ["search", searchOptions],
         type: "all",
       }),
-    searchQuery: () =>
+    useQuery: () =>
       useQuery({
         queryKey: ["search", searchOptions],
         queryFn: getResults,

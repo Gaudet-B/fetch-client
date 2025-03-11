@@ -13,7 +13,7 @@ function _getColumnSizes<TD>(
 ): ColumnSizing {
   if (!width) return {} as ColumnSizing;
 
-  let columnSizing: ColumnSizing = {};
+  const columnSizing: ColumnSizing = {};
   let fixedWidth = 0,
     adjustableWidth = 0;
 

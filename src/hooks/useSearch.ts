@@ -43,7 +43,7 @@ export default function useSearch(
     Array<string> | undefined
   >();
 
-  const { searchOptions, setSearchOptions, invalidate, searchQuery } =
+  const { searchOptions, setSearchOptions, invalidate, useQuery } =
     useSearchQuery();
 
   const handleUpdateFavorites = (dogId: DogRow["id"], selected: boolean) => {
@@ -172,7 +172,7 @@ export default function useSearch(
     data: searchData,
     isLoading: searchLoading,
     isError: searchError,
-  } = searchQuery();
+  } = useQuery();
 
   useEffect(() => {
     if (searchData) {

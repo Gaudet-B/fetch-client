@@ -262,13 +262,11 @@ function OptionSeparator() {
 
 function SelectOption({
   item,
-  idx,
   lastItem,
   multiple,
   selected,
 }: {
   item: string;
-  idx: number;
   lastItem: boolean;
   multiple: boolean;
   selected: string | Array<string>;
@@ -324,7 +322,6 @@ export function Select({
             <SelectOption
               key={`${item}-${idx}`}
               item={item}
-              idx={idx}
               lastItem={idx === items.length - 1}
               multiple={multiple}
               selected={selected}

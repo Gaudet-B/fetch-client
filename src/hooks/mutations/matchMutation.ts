@@ -9,6 +9,6 @@ async function getMatch(dogIds: Array<string>) {
   return match;
 }
 
-export default function matchMutation() {
+export default function useMatchMutation() {
   return useMutation({ mutationFn: getMatch });
 }

@@ -29,7 +29,7 @@ import debounce from "lodash.debounce";
 
 const PLACEHOLDER_ROWS = Array.from(
   { length: 10 },
-  (_) => ({}),
+  (_) => ({}), // eslint-disable-line @typescript-eslint/no-unused-vars
 ) as Array<DogRow>;
 
 function MatchContent({ match }: { match?: DogRow }) {
@@ -338,7 +338,6 @@ export function SearchResultsList({
   const { isLoading } = useSearchContext();
 
   const resultsRef = useRef<HTMLDivElement>(null);
-  const scrollableRef = useRef<HTMLDivElement>(null);
   const prevLoadingRef = useRef(isLoading);
 
   // Reset scroll position when loading finishes
