@@ -196,15 +196,17 @@ function PlusIcon() {
 }
 
 export function Checkbox({
-  checked,
   name,
+  checked,
   checkedIcon = "check",
   uncheckedIcon = "empty",
+  onChange,
 }: {
+  name?: string;
   checked?: boolean;
   checkedIcon?: "check" | "plus";
   uncheckedIcon?: "empty" | "plus";
-  name?: string;
+  onChange?: (checked: boolean) => void;
 }) {
   const Icon = useMemo(() => {
     const c = checkedIcon === "check" ? CheckmarkIcon : PlusIcon;
@@ -212,11 +214,16 @@ export function Checkbox({
     return checked ? c : u;
   }, [checked]);
 
+  const handleChange = (checked: boolean) => {
+    onChange?.(checked);
+  };
+
   return (
     <HeadlessCheckbox
       className="group block size-4 rounded border bg-white data-[checked]:bg-blue-500"
       name={name}
       checked={checked}
+      onChange={handleChange}
     >
       {Icon && <Icon />}
     </HeadlessCheckbox>
@@ -225,18 +232,26 @@ export function Checkbox({
 
 function MultiSelectOption({
   item,
-  selected,
+  checked,
+  onChange,
 }: {
   item: string;
-  selected: Array<string>;
+  checked: boolean;
+  onChange: (value: string, checked: boolean) => void;
 }) {
+  const handleChange = (checked: boolean) => {
+    onChange(item, checked);
+  };
+
   return (
     <ListboxOption
-      className="flex h-8 items-center justify-start gap-2 align-text-top"
+      className="flex h-8 cursor-pointer items-center justify-start gap-2 align-text-top"
       value={item}
     >
-      <Checkbox checked={selected.includes(item)} />
-      <span className="mb-1">{item}</span>
+      <Checkbox checked={checked} name={item} onChange={handleChange} />
+      <span className="mb-1 w-[16ch] overflow-hidden text-ellipsis whitespace-nowrap">
+        {item}
+      </span>
     </ListboxOption>
   );
 }
@@ -244,13 +259,13 @@ function MultiSelectOption({
 const MemoizedMultiSelectOption = React.memo(
   MultiSelectOption,
   (prevProps, nextProps) => {
-    return prevProps.selected === nextProps.selected;
+    return prevProps.checked === nextProps.checked;
   },
 );
 
 function SingleSelectOption({ item }: { item: string }) {
   return (
-    <ListboxOption key={item} value={item}>
+    <ListboxOption key={item} value={item} className="cursor-pointer">
       {item}
     </ListboxOption>
   );
@@ -265,18 +280,37 @@ function SelectOption({
   lastItem,
   multiple,
   selected,
+  onChange,
 }: {
   item: string;
   lastItem: boolean;
   multiple: boolean;
   selected: string | Array<string>;
+  onChange: (value: string | Array<string>) => void;
 }) {
-  return multiple && Array.isArray(selected) ? (
-    <>
-      <MemoizedMultiSelectOption key={item} item={item} selected={selected} />
-      {!lastItem && <OptionSeparator key={`${item}-separator`} />}
-    </>
-  ) : (
+  if (multiple && Array.isArray(selected)) {
+    const handleChange = (value: string, checked: boolean) => {
+      const newSelected = checked
+        ? [...selected, value]
+        : selected.filter((i) => i !== value);
+
+      onChange(newSelected);
+    };
+
+    return (
+      <>
+        <MemoizedMultiSelectOption
+          key={item}
+          item={item}
+          checked={selected.includes(item)}
+          onChange={handleChange}
+        />
+        {!lastItem && <OptionSeparator key={`${item}-separator`} />}
+      </>
+    );
+  }
+
+  return (
     <>
       <SingleSelectOption key={item} item={item} />
       {!lastItem && <OptionSeparator key={`${item}-separator`} />}
@@ -325,6 +359,7 @@ export function Select({
               lastItem={idx === items.length - 1}
               multiple={multiple}
               selected={selected}
+              onChange={onChange}
             />
           ))}
         </ListboxOptions>

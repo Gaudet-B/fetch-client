@@ -75,12 +75,24 @@ function AgeCell(props: CellContext<DogRow, number>) {
   const width = columnSizing.age;
   const age = props.getValue();
 
+  const getAgeText = (age: number) => {
+    if (age === undefined) return "";
+    switch (age) {
+      case 0:
+        return "less than a year old";
+      case 1:
+        return "1 year old";
+      default:
+        return `${age} years old`;
+    }
+  };
+
   return (
     <div
-      className="flex w-full -translate-x-16 translate-y-3 items-center justify-start text-nowrap px-2 text-sm font-semibold text-gray-800"
+      className="flex w-full translate-y-3 items-center justify-start text-nowrap px-2 text-sm font-semibold text-gray-800"
       style={{ width: `${width}px` }}
     >
-      {age && `${age} years old`}
+      {getAgeText(age)}
     </div>
   );
 }
