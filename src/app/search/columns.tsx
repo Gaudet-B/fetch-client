@@ -89,7 +89,7 @@ function AgeCell(props: CellContext<DogRow, number>) {
 
   return (
     <div
-      className="flex w-full translate-y-3 items-center justify-start text-nowrap px-2 text-sm font-semibold text-gray-800"
+      className="flex w-full -translate-x-16 translate-y-3 items-center justify-start text-nowrap px-2 text-sm font-semibold text-gray-800"
       style={{ width: `${width}px` }}
     >
       {getAgeText(age)}
