@@ -4,10 +4,11 @@ import {
   createColumnHelper,
   ColumnDef,
   CellContext,
+  HeaderContext,
 } from "@tanstack/react-table";
 import { useColumnSizingContext } from "@components/table/context";
 import { FavoriteButton } from "~/app/_components/design-system/button/button";
-import { Location } from "~/types/api";
+import { Location, SortableFields } from "~/types/api";
 import { useSearchContext } from "./context";
 import { useMemo } from "react";
 
@@ -21,8 +22,54 @@ export type DogRow = {
   location: Location;
 };
 
-function HeaderCell({ text }: { text: string }) {
-  return <span className="font-sans">{text}</span>;
+function HeaderCell({
+  text,
+  sortField,
+  headerProps,
+}: {
+  text: string;
+  sortField?: SortableFields;
+  headerProps?: HeaderContext<DogRow, string>;
+}) {
+  const isSorted = headerProps?.table
+    .getState()
+    .sorting.find((col) => col.id === sortField);
+
+  const sortDirection = isSorted?.desc ? "desc" : "asc";
+
+  const { handleSortChange } = useSearchContext();
+
+  const handleClick = !sortField
+    ? undefined
+    : () => {
+        const sortingState = headerProps?.table
+          .getState()
+          .sorting?.find((col) => col.id === sortField);
+
+        const newDirection = sortingState?.desc ? "asc" : "desc";
+
+        handleSortChange(sortField, newDirection);
+      };
+
+  return (
+    <div
+      className={`flex h-full items-center gap-1 ${sortField ? "cursor-pointer transition-all duration-100 hover:text-green-500" : ""}`}
+      onClick={handleClick}
+    >
+      <span
+        className={`scale-95 font-sans text-lg ${sortField ? "hover:scale-100" : ""} ${isSorted ? "scale-100" : ""}`}
+      >
+        {text}
+      </span>
+      {isSorted && (
+        <span
+          className={`text-sm ${sortDirection === "asc" ? "" : "rotate-180"}`}
+        >
+          ▼
+        </span>
+      )}
+    </div>
+  );
 }
 
 function ImgCell(props: CellContext<DogRow, string>) {
@@ -180,8 +227,11 @@ export function getColumns() {
     }),
     columnHelper.accessor("name", {
       id: "name",
-      header: "",
+      header: (props) => (
+        <HeaderCell headerProps={props} text="age" sortField="age" />
+      ),
       cell: (props) => <NameCell {...props} />,
+      enableSorting: true,
       size: 70,
       maxSize: 70,
     }),
@@ -195,7 +245,9 @@ export function getColumns() {
     }),
     columnHelper.accessor("breed", {
       id: "breed",
-      header: () => <HeaderCell text="breed" />,
+      header: (props) => (
+        <HeaderCell headerProps={props} text="breed" sortField="breed" />
+      ),
       cell: (props) => <BreedCell {...props} />,
       enableSorting: true,
       size: 100,
@@ -204,7 +256,6 @@ export function getColumns() {
       id: "location",
       header: () => <HeaderCell text="location" />,
       cell: (props) => <LocationCell {...props} />,
-      enableSorting: true,
       size: 100,
     }),
     columnHelper.display({

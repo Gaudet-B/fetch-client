@@ -17,6 +17,8 @@ const BASE_URL = process.env.BASE_URL;
 const DEFAULT_DOGS_PER_PAGE = 25;
 const RESULTS_PER_PAGE = DEFAULT_DOGS_PER_PAGE;
 
+const DEFAULT_SEARCH_URL = `${BASE_URL}/dogs/search?sort=breed:asc&size=${RESULTS_PER_PAGE}`;
+
 function _handleError(error: ErrorObject) {
   const { redirect, code, message } = error;
   if (redirect) return NextResponse.redirect(redirect);
@@ -27,13 +29,10 @@ async function getInitialDogIds(request: NextRequest) {
   const options = await getOptions();
   const headers = await getRequestHeaders(options, request);
 
-  const response = await fetch(
-    `${BASE_URL}/dogs/search?size=${RESULTS_PER_PAGE}`,
-    {
-      ...options,
-      headers,
-    },
-  );
+  const response = await fetch(DEFAULT_SEARCH_URL, {
+    ...options,
+    headers,
+  });
 
   if (!response.ok) {
     return await errorHandler(

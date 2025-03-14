@@ -33,8 +33,9 @@ export async function getRequestHeaders(
 
   const headers = new Headers({
     ...options.headers,
-    [cookie!.name]: cookie!.value,
   });
+
+  if (cookie) headers.set(cookie.name, cookie.value);
 
   for (const [key, value] of req.headers.entries()) headers.set(key, value);
   // for POST request headers

@@ -5,9 +5,14 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { getOptions } from "~/server/requestOptions";
-import { SearchOptionsType, SearchResultsType } from "~/types/api";
+import {
+  SearchErrorType,
+  SearchOptionsType,
+  SearchResultsType,
+} from "~/types/api";
 
 const DEFAULT_SEARCH_OPTIONS = { searchOptions: undefined, url: undefined };
+const DEFAULT_SEARCH_URL = "/api/dogs/search?sort=breed:asc&size=25";
 
 type SearchOptions = {
   searchOptions?: SearchOptionsType;
@@ -27,15 +32,20 @@ async function getSearchResults(opts: SearchOptions) {
         params.append(key, String(value));
       }
     });
+    // add the default sort and size
+    if (!params.has("sort")) params.append("sort", "breed:asc");
+    if (!params.has("size")) params.append("size", "25");
   }
-  let searchUrl = "/api/dogs/search";
+  let searchUrl = DEFAULT_SEARCH_URL;
   if (params) searchUrl = `/api/dogs/search?${params.toString()}`;
   if (url) searchUrl = `/api/dogs/search?url=${url}`;
   const options = await getOptions();
   const response = await fetch(searchUrl, {
     ...options,
   });
-  const results = (await response.json()) as SearchResultsType;
+  const results = (await response.json()) as
+    | SearchResultsType
+    | SearchErrorType;
   return results;
 }
 

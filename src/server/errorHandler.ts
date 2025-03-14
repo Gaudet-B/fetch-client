@@ -34,7 +34,7 @@ function unauthorized(
   const error = {
     code: 401,
     message: "Authorization failed. Check token expiration.",
-    redirect: new URL("/login", request.url),
+    redirect: new URL("/login?auth=failed", request.url),
   };
   console.error(
     _getErrorMessage(

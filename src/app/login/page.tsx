@@ -13,12 +13,25 @@ function LoginContainer({ children }: PropsWithChildren) {
   );
 }
 
-export default async function Login() {
+export default async function Login({
+  searchParams,
+}: {
+  searchParams: Promise<{ auth: string }>;
+}) {
+  const params = await searchParams;
+  const auth = params?.auth;
+  const authFailed = auth === "failed";
+
   return (
     <>
       <Navigation loggedIn={false} />
       <Main>
         <LoginContainer>
+          {authFailed && (
+            <span className="absolute -translate-y-12 text-base text-red-500">
+              authorization token expired - please login again
+            </span>
+          )}
           <H1>please log in.</H1>
           <LoginForm />
         </LoginContainer>

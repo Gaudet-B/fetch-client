@@ -22,15 +22,21 @@ import {
 import Modal from "@designsystem/modal";
 import Table from "@components/table";
 import useInitDogs from "~/hooks/queries/useInitQuery";
-import { PaginationType } from "~/types/api";
+import { PaginationType, SearchConfigType } from "~/types/api";
 import { SearchProvider, useSearchContext } from "./context";
 import { DogRow, getColumns } from "./columns";
 import debounce from "lodash.debounce";
 
 const PLACEHOLDER_ROWS = Array.from(
-  { length: 10 },
+  { length: 25 },
   (_) => ({}), // eslint-disable-line @typescript-eslint/no-unused-vars
 ) as Array<DogRow>;
+
+function _getSortingState(sort?: SearchConfigType["sort"]) {
+  return sort
+    ? [{ id: sort.split(":")[0], desc: sort.split(":")[1] === "desc" }]
+    : [];
+}
 
 function MatchContent({ match }: { match?: DogRow }) {
   return (
@@ -301,7 +307,7 @@ function DogTable({
   resultsRef: RefObject<HTMLDivElement | null>;
   setContainerWidth: (width: number) => void;
 }) {
-  const { dogs, isLoading } = useSearchContext();
+  const { dogs, isLoading, searchOptions } = useSearchContext();
 
   const data = useMemo(() => {
     if (isLoading || !dogs) return PLACEHOLDER_ROWS;
@@ -318,8 +324,9 @@ function DogTable({
         loading={isLoading}
         pagination={pagination}
         width={containerWidth}
-        setContainerWidth={setContainerWidth}
         widthRef={resultsRef}
+        setContainerWidth={setContainerWidth}
+        sortingState={_getSortingState(searchOptions?.searchOptions?.sort)}
       />
       <PaginationControls />
     </>

@@ -15,11 +15,14 @@ import {
 } from "~/types/api";
 
 const BASE_URL = process.env.BASE_URL;
+const DEFAULT_DOGS_PER_PAGE = 25;
+const RESULTS_PER_PAGE = DEFAULT_DOGS_PER_PAGE;
+
+const DEFAULT_SEARCH_URL = `${BASE_URL}/dogs/search?sort=breed:asc&size=${RESULTS_PER_PAGE}`;
 
 function _handleError(error: ErrorObject) {
   const { redirect, code, message } = error;
-  if (redirect) return NextResponse.redirect(redirect);
-  return NextResponse.json({ status: code, message });
+  return NextResponse.json({ status: code, message, redirect });
 }
 
 async function getSearchResults(reqUrl: NextURL, request: NextRequest) {
@@ -30,11 +33,11 @@ async function getSearchResults(reqUrl: NextURL, request: NextRequest) {
   const url = searchParams?.get("url");
 
   // handle the case where no url or params are provided - this is the default search
-  let searchUrl = `${BASE_URL}/dogs/search?size=25`;
+  let searchUrl = DEFAULT_SEARCH_URL;
   // handle the case where a full url is provided - this is for pagination (prev, next)
   if (url) searchUrl = `${BASE_URL}${search.slice(5)}`;
   // handle the case where a search query is provided - this is most searches
-  else searchUrl = `${BASE_URL}/dogs/search${search}`;
+  else if (search) searchUrl = `${BASE_URL}/dogs/search${search}`;
 
   const response = await fetch(searchUrl, {
     ...options,

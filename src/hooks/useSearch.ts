@@ -1,9 +1,16 @@
 import { useEffect, useState } from "react";
-import { PaginationType, SearchOptionsType } from "~/types/api";
+import {
+  PaginationType,
+  SearchErrorType,
+  SearchOptionsType,
+  SearchResultsType,
+  SortableFields,
+} from "~/types/api";
 import { DogRow } from "~/app/search/columns";
 import locationSearchMutation from "./mutations/locationSearchMutation";
 import useMatchMutation from "./mutations/matchMutation";
 import useSearchQuery from "./queries/useSearchQuery";
+import { redirect } from "next/navigation";
 
 export type FiltersType = {
   breeds: Array<string>;
@@ -78,6 +85,20 @@ export default function useSearch(
     setIsLoading(true);
     setSearchOptions(options);
     invalidate();
+  };
+
+  const handleSortChange = (
+    field: SortableFields,
+    direction: "asc" | "desc",
+  ) => {
+    const sort = `${field}:${direction}` as const;
+    handleSearchOptionsChange({
+      searchOptions: {
+        ...searchOptions.searchOptions,
+        sort,
+      },
+      url: undefined,
+    });
   };
 
   const locationMutation = locationSearchMutation();
@@ -168,15 +189,17 @@ export default function useSearch(
     });
   };
 
-  const {
-    data: searchData,
-    isLoading: searchLoading,
-    isError: searchError,
-  } = useQuery();
+  const { data: searchData, isLoading: searchLoading } = useQuery();
+
+  if ((searchData as SearchErrorType)?.status === 401) {
+    console.error((searchData as SearchErrorType).message);
+    const redirectUrl = (searchData as SearchErrorType).redirect;
+    if (redirectUrl) redirect(redirectUrl);
+  }
 
   useEffect(() => {
     if (searchData) {
-      const { dogs, next, prev, total } = searchData;
+      const { dogs, next, prev, total } = searchData as SearchResultsType;
       setDogs(dogs);
       setPagination({ next, prev, total });
     }
@@ -186,8 +209,8 @@ export default function useSearch(
   const handleSubmitSearch = (optionsOrUrl: SearchOptionsType | string) => {
     if (typeof optionsOrUrl === "string") {
       handleSearchOptionsChange({
-        url: optionsOrUrl,
         searchOptions: undefined,
+        url: optionsOrUrl,
       });
     } else {
       handleSearchOptionsChange({
@@ -248,8 +271,8 @@ export default function useSearch(
     match,
     matchLoading,
     pagination,
-    searchData,
-    searchError,
+    searchData: searchData as SearchResultsType,
+    searchOptions,
     searchText,
     searchTerms,
     showMatch,
@@ -263,6 +286,7 @@ export default function useSearch(
     handleSearchTextChange,
     handleSelectSearchTerm,
     handleSubmitSearch,
+    handleSortChange,
     handleUpdateFavorites,
   };
 }

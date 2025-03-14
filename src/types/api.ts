@@ -9,8 +9,6 @@ export type Dog = {
   breed: string;
 };
 
-export type SortableFields = "age" | "breed" | "name" | "zip_code";
-
 export type Location = {
   zip_code: string;
   latitude: number;
@@ -60,10 +58,12 @@ export type PaginationType = {
   total: number;
 };
 
+export type SortableFields = "age" | "breed" | "name";
+
 export type SearchConfigType = {
   size?: number;
   from?: number;
-  sort?: `sort=${SortableFields}:${"asc" | "desc"}`;
+  sort?: `${SortableFields}:${"asc" | "desc"}`;
 };
 
 export type SearchOptionsType = {
@@ -86,4 +86,10 @@ export type SearchResultsType = {
   next: string | undefined;
   prev: string | undefined;
   total: number;
+};
+
+export type SearchErrorType = {
+  status?: number;
+  message?: string;
+  redirect?: string;
 };

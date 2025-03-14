@@ -11,6 +11,7 @@ import {
   ColumnResizeMode,
   ColumnResizeDirection,
   PaginationState,
+  SortingState,
 } from "@tanstack/react-table";
 import React, { RefObject, useState } from "react";
 import { PropsWithChildren } from "react";
@@ -19,6 +20,8 @@ import { PaginationType } from "~/types/api";
 import { ColumnSizingProvider } from "./context";
 
 const PAGE_SIZE = 25;
+const DEFAULT_PAGINATION_STATE = { pageIndex: 0, pageSize: PAGE_SIZE };
+const DEFAULT_SORTING_STATE = [{ id: "breed", desc: false }];
 
 function TableRow({
   children,
@@ -140,6 +143,7 @@ export default function Table<TD>({
   data,
   loading,
   pagination,
+  sortingState,
   width,
   widthRef,
   setContainerWidth,
@@ -148,6 +152,7 @@ export default function Table<TD>({
   data: Array<TD>;
   loading?: boolean;
   pagination?: PaginationType;
+  sortingState?: SortingState;
   width?: number;
   widthRef: RefObject<HTMLDivElement | null>;
   setContainerWidth: (width: number) => void;
@@ -162,10 +167,10 @@ export default function Table<TD>({
 
   const [columnResizeMode] = useState<ColumnResizeMode>("onChange");
   const [columnResizeDirection] = useState<ColumnResizeDirection>("ltr");
-  const [paginationState, setPaginationState] = useState<PaginationState>({
-    pageIndex: 0,
-    pageSize: PAGE_SIZE,
-  });
+  // const [columnSorting, setColumnSorting] = useState<SortingState>([]);
+  const [paginationState, setPaginationState] = useState<PaginationState>(
+    DEFAULT_PAGINATION_STATE,
+  );
 
   const tableOptions: TableOptions<TD> = {
     columns,
@@ -175,15 +180,18 @@ export default function Table<TD>({
     autoResetPageIndex: true,
     enableColumnResizing: true,
     manualPagination: true,
+    manualSorting: true,
     rowCount: pagination?.total,
     getCoreRowModel: getCoreRowModel(),
     onColumnSizingChange: handleColumnSizingChange,
     onPaginationChange: setPaginationState,
+    // onSortingChange: setColumnSorting,
     initialState: {
       columnSizing: {},
-      pagination: { pageIndex: 0, pageSize: PAGE_SIZE },
+      pagination: DEFAULT_PAGINATION_STATE,
+      sorting: sortingState ?? DEFAULT_SORTING_STATE,
     },
-    state: { pagination: paginationState },
+    state: { pagination: paginationState, sorting: sortingState },
     debugTable: process.env.NODE_ENV === "development",
   };
   const table = useReactTable(tableOptions);

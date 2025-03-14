@@ -6,6 +6,7 @@ import {
   SearchResultsType,
   PaginationType,
   SearchOptionsType,
+  SortableFields,
 } from "~/types/api";
 import { DogRow } from "./columns";
 
@@ -20,7 +21,7 @@ type SearchContextType =
       matchLoading: boolean | undefined;
       pagination: PaginationType | undefined;
       searchData: SearchResultsType | undefined;
-      searchError: boolean | undefined;
+      searchOptions: { searchOptions?: SearchOptionsType; url?: string };
       searchText: string | undefined;
       searchTerms: Array<string> | undefined;
       showMatch: boolean;
@@ -38,6 +39,10 @@ type SearchContextType =
       handleSelectSearchTerm: (value: string) => void;
       handleSubmitSearch: (optionsOrUrl: SearchOptionsType | string) => void;
       handleUpdateFavorites: (dogId: DogRow["id"], selected: boolean) => void;
+      handleSortChange: (
+        field: SortableFields,
+        direction: "asc" | "desc",
+      ) => void;
     }
   | undefined;
 
